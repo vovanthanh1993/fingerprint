@@ -4,14 +4,14 @@ apply from: '../shared/keepUnitySymbols.gradle'
 
 **APPLY_PLUGINS**
 
-// Giải quyết xung đột phiên bản Kotlin - ĐẶT TRƯỚC dependencies
+// Resolve Kotlin version conflicts - MUST BE PLACED BEFORE dependencies
 configurations.all {
     resolutionStrategy {
-        // Force sử dụng phiên bản Kotlin mới nhất
+        // Force use the latest Kotlin version
         force 'org.jetbrains.kotlin:kotlin-stdlib:1.8.20'
     }
     
-    // Exclude các phiên bản Kotlin cũ gây duplicate classes
+    // Exclude old Kotlin versions that cause duplicate classes
     exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib-jdk7'
     exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib-jdk8'
 }
@@ -21,7 +21,7 @@ dependencies {
     
     // Biometric Plugin Dependencies
     implementation('androidx.biometric:biometric:1.1.0') {
-        // Loại bỏ các phiên bản Kotlin cũ để tránh xung đột
+        // Exclude old Kotlin versions to avoid conflicts
         exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib-jdk7'
         exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib-jdk8'
     }
@@ -74,7 +74,7 @@ android {
     }
     
     packaging {
-        // Giải quyết duplicate classes từ Kotlin stdlib
+        // Resolve duplicate classes from Kotlin stdlib
         pickFirst '**/kotlin-stdlib*.jar'
         exclude 'META-INF/kotlin-stdlib*.kotlin_module'
     }**PACKAGING**

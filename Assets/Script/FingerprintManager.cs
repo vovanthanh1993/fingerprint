@@ -22,33 +22,33 @@ public class FingerprintManager : MonoBehaviour
 
     void Awake()
     {
-        // Singleton pattern để đảm bảo chỉ có một instance
+        // Singleton pattern to ensure only one instance exists
         if (instance == null)
         {
             instance = this;
-            // Đảm bảo GameObject không bị destroy khi load scene mới
+            // Ensure GameObject is not destroyed when loading new scenes
             DontDestroyOnLoad(gameObject);
-            // Đảm bảo tên GameObject đúng
+            // Ensure GameObject name is correct
             gameObject.name = "FingerprintManager";
             Debug.Log("FingerprintManager GameObject initialized: " + gameObject.name);
         }
         else
         {
-            // Nếu đã có instance, destroy duplicate
+            // If instance already exists, destroy duplicate
             Destroy(gameObject);
         }
     }
 
     void Start()
     {
-        // Khởi tạo plugin class
+        // Initialize plugin class
         InitializePlugin();
         
         Debug.Log("FingerprintManager Start() - GameObject: " + gameObject.name + ", Active: " + gameObject.activeSelf);
     }
 
     /// <summary>
-    /// Khởi tạo plugin class
+    /// Initialize plugin class
     /// </summary>
     public static void InitializePlugin()
     {
@@ -58,11 +58,11 @@ public class FingerprintManager : MonoBehaviour
             Debug.Log("Initializing Android BiometricPlugin class...");
             // Get plugin class
             biometricPluginClass = new AndroidJavaClass("com.example.biometricplugin.BiometricPlugin");
-            Debug.Log("✓ Android BiometricPlugin class loaded successfully");
+            Debug.Log("Android BiometricPlugin class loaded successfully");
         }
         catch (Exception e)
         {
-            Debug.LogError("❌ Failed to load BiometricPlugin class: " + e.Message);
+            Debug.LogError("Failed to load BiometricPlugin class: " + e.Message);
             Debug.LogError("Please check:");
             Debug.LogError("1. File biometricplugin.aar exists in Assets/Plugins/Android/");
             Debug.LogError("2. Package name is correct: com.example.biometricplugin.BiometricPlugin");
@@ -74,11 +74,11 @@ public class FingerprintManager : MonoBehaviour
         bool isAvailable = IsBiometricAvailable();
         if (isAvailable)
         {
-            Debug.Log("✓ iOS Biometric authentication is available");
+            Debug.Log("iOS Biometric authentication is available");
         }
         else
         {
-            Debug.LogWarning("⚠️ iOS Biometric authentication is not available on this device");
+            Debug.LogWarning("iOS Biometric authentication is not available on this device");
         }
         #else
         Debug.Log("InitializePlugin() - Running in Editor, skipping plugin initialization");
@@ -86,7 +86,7 @@ public class FingerprintManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Gọi phương thức authenticate từ plugin (Android hoặc iOS)
+    /// Call authenticate method from plugin (Android or iOS)
     /// </summary>
     public static void Authenticate()
     {
@@ -117,11 +117,11 @@ public class FingerprintManager : MonoBehaviour
             // Plugin will automatically get Unity Activity from UnityPlayer.currentActivity
             biometricPluginClass.CallStatic("authenticate");
             
-            Debug.Log("✓ Android authenticate() called successfully!");
+            Debug.Log("Android authenticate() called successfully!");
         }
         catch (Exception e)
         {
-            Debug.LogError("❌ Error calling Android authenticate: " + e.Message);
+            Debug.LogError("Error calling Android authenticate: " + e.Message);
             Debug.LogError("Stack trace: " + e.StackTrace);
         }
         
@@ -134,7 +134,7 @@ public class FingerprintManager : MonoBehaviour
             // Check if biometric is available
             if (!IsBiometricAvailable())
             {
-                Debug.LogError("❌ Biometric authentication is not available on this iOS device");
+                Debug.LogError("Biometric authentication is not available on this iOS device");
                 if (instance != null)
                 {
                     instance.OnError("Biometric authentication is not available");
@@ -146,11 +146,11 @@ public class FingerprintManager : MonoBehaviour
             string reason = "Authenticate to continue";
             AuthenticateBiometric(reason);
             
-            Debug.Log("✓ iOS authenticate() called successfully!");
+            Debug.Log("iOS authenticate() called successfully!");
         }
         catch (Exception e)
         {
-            Debug.LogError("❌ Error calling iOS authenticate: " + e.Message);
+            Debug.LogError("Error calling iOS authenticate: " + e.Message);
             Debug.LogError("Stack trace: " + e.StackTrace);
         }
         
@@ -162,8 +162,8 @@ public class FingerprintManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Instance method để gọi từ Unity Button OnClick
-    /// Unity Button OnClick có thể gọi cả static và instance methods
+    /// Instance method to call from Unity Button OnClick
+    /// Unity Button OnClick can call both static and instance methods
     /// </summary>
     public void AuthenticateButton()
     {
@@ -172,7 +172,7 @@ public class FingerprintManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Callback được gọi từ Android/iOS plugin khi xác thực thành công
+    /// Callback called from Android/iOS plugin when authentication succeeds
     /// Android: UnitySendMessage("FingerprintManager", "OnSuccess", "")
     /// iOS: UnitySendMessage("FingerprintManager", "OnSuccess", "")
     /// </summary>
@@ -186,13 +186,13 @@ public class FingerprintManager : MonoBehaviour
         Debug.Log("Loading GamePlayScene...");
         
         // Load GamePlayScene when authentication succeeds
-        // Delay một chút để đảm bảo callback đã hoàn thành
+        // Delay slightly to ensure callback has completed
         StartCoroutine(LoadGamePlaySceneDelayed());
     }
 
     private System.Collections.IEnumerator LoadGamePlaySceneDelayed()
     {
-        // Đợi 0.1 giây để đảm bảo callback đã hoàn thành
+        // Wait 0.1 seconds to ensure callback has completed
         yield return new WaitForSeconds(0.1f);
         
         try
@@ -208,7 +208,7 @@ public class FingerprintManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Callback được gọi từ Android/iOS plugin khi xác thực thất bại
+    /// Callback called from Android/iOS plugin when authentication fails
     /// Android: UnitySendMessage("FingerprintManager", "OnFailed", "")
     /// iOS: UnitySendMessage("FingerprintManager", "OnFailed", "")
     /// </summary>
@@ -220,12 +220,12 @@ public class FingerprintManager : MonoBehaviour
         Debug.Log("Biometric authentication failed! Message: " + message);
         Debug.Log("GameObject: " + gameObject.name + ", Active: " + gameObject.activeSelf);
         
-        // Thêm logic xử lý khi xác thực thất bại ở đây
-        // Ví dụ: hiển thị thông báo lỗi, cho phép thử lại, etc.
+        // Add logic to handle authentication failure here
+        // Example: show error message, allow retry, etc.
     }
 
     /// <summary>
-    /// Callback được gọi từ Android/iOS plugin khi có lỗi xảy ra
+    /// Callback called from Android/iOS plugin when an error occurs
     /// Android: UnitySendMessage("FingerprintManager", "OnError", errorMessage)
     /// iOS: UnitySendMessage("FingerprintManager", "OnError", errorMessage)
     /// </summary>
@@ -236,7 +236,5 @@ public class FingerprintManager : MonoBehaviour
         Debug.LogError("========================================");
         Debug.LogError("Biometric authentication error: " + errorMessage);
         Debug.LogError("GameObject: " + gameObject.name + ", Active: " + gameObject.activeSelf);
-        
-        // Thêm logic xử lý khi có lỗi ở đây
     }
 }
